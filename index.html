@@ -1,0 +1,2938 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Palace Hotel - نظام إدارة الفنادق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========== المتغيرات ========== */
+:root {
+    --gold: #c9a961;
+    --gold-light: #e8d4a2;
+    --gold-dark: #a8863f;
+    --gold-gradient: linear-gradient(135deg, #c9a961 0%, #e8d4a2 50%, #c9a961 100%);
+    --navy: #0a1628;
+    --navy-light: #142b4a;
+    --navy-medium: #1a3654;
+    --bg: #f5f2eb;
+    --card-bg: #ffffff;
+    --text: #1a2332;
+    --text-light: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #e5e1d8;
+    --success: #10b981;
+    --success-bg: #d1fae5;
+    --danger: #ef4444;
+    --danger-bg: #fee2e2;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --info: #3b82f6;
+    --info-bg: #dbeafe;
+    --purple: #8b5cf6;
+    --shadow-sm: 0 1px 3px rgba(10, 22, 40, 0.06);
+    --shadow: 0 4px 20px rgba(10, 22, 40, 0.08);
+    --shadow-lg: 0 20px 50px rgba(10, 22, 40, 0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-lg: 24px;
+    --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark {
+    --bg: #060d18;
+    --card-bg: #0f1d33;
+    --text: #f1f5f9;
+    --text-light: #94a3b8;
+    --text-muted: #64748b;
+    --border: #1e3a5f;
+    --navy-light: #0f1d33;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: var(--transition);
+}
+
+/* ========== الشريط الجانبي ========== */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    right: 0; top: 0;
+    z-index: 100;
+    box-shadow: -10px 0 40px rgba(10, 22, 40, 0.15);
+    transition: var(--transition);
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 3px;
+    background: var(--gold-gradient);
+}
+
+.sidebar-header {
+    padding: 28px 24px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.logo-mark {
+    width: 56px; height: 56px;
+    margin: 0 auto 10px;
+    background: var(--gold-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 8px 25px rgba(201, 169, 97, 0.4);
+}
+
+.sidebar-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-header p {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    right: -100%;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    background: rgba(201, 169, 97, 0.08);
+    color: var(--gold-light);
+}
+
+.nav-link:hover::before { right: 0; }
+
+.nav-link.active {
+    background: linear-gradient(90deg, rgba(201, 169, 97, 0.2), rgba(201, 169, 97, 0.05));
+    color: var(--gold-light);
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(201, 169, 97, 0.25);
+}
+
+.nav-link.active::before { right: 0; }
+.nav-link .icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.hotel-config {
+    background: rgba(201, 169, 97, 0.08);
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid rgba(201, 169, 97, 0.2);
+    margin-bottom: 10px;
+}
+
+.hotel-config label {
+    font-size: 0.68rem;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.hotel-config input {
+    width: 100%;
+    background: rgba(10, 22, 40, 0.5);
+    border: 1px solid rgba(201, 169, 97, 0.25);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.82rem;
+    transition: var(--transition);
+}
+
+.hotel-config input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+}
+
+/* ========== المحتوى الرئيسي ========== */
+.main-content {
+    margin-right: 280px;
+    padding: 28px 36px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    transition: var(--transition);
+}
+
+.section { display: none; animation: sectionIn 0.5s ease; }
+.section.active { display: block; }
+
+@keyframes sectionIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== رأس الصفحة ========== */
+.hero-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-medium) 100%);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.hero-header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(201, 169, 97, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.hero-date h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.hero-date p {
+    color: var(--gold-light);
+    font-size: 0.88rem;
+}
+
+.hero-date p::before { content: '📅 '; }
+
+.hero-host {
+    text-align: left;
+    background: rgba(201, 169, 97, 0.12);
+    padding: 14px 22px;
+    border-radius: 12px;
+    border: 1px solid rgba(201, 169, 97, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.hero-host .label {
+    font-size: 0.68rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.hero-host .value {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+}
+
+/* ========== بطاقات الإحصائيات ========== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100%; height: 4px;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.gold::before { background: var(--gold-gradient); }
+.stat-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.stat-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.stat-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.stat-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+.stat-header { margin-bottom: 12px; }
+
+.stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.stat-card.gold .stat-icon { background: rgba(201, 169, 97, 0.15); color: var(--gold); }
+.stat-card.green .stat-icon { background: var(--success-bg); color: var(--success); }
+.stat-card.red .stat-icon { background: var(--danger-bg); color: var(--danger); }
+.stat-card.blue .stat-icon { background: var(--info-bg); color: var(--info); }
+.stat-card.purple .stat-icon { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
+.stat-card.orange .stat-icon { background: var(--warning-bg); color: var(--warning); }
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-family: 'Playfair Display', serif;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* ========== البطاقات ========== */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(201, 169, 97, 0.03), transparent);
+}
+
+.card-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header h3::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: var(--gold-gradient);
+    border-radius: 2px;
+}
+
+/* ========== الأزرار ========== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: var(--gold-gradient);
+    color: var(--navy);
+    box-shadow: 0 4px 15px rgba(201, 169, 97, 0.35);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(201, 169, 97, 0.5);
+}
+
+.btn-navy { background: var(--navy); color: #fff; }
+.btn-navy:hover { background: var(--navy-medium); transform: translateY(-2px); }
+
+.btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201, 169, 97, 0.05);
+}
+
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #059669; transform: translateY(-2px); }
+
+.btn-sm { padding: 6px 12px; font-size: 0.76rem; border-radius: 8px; }
+
+/* ========== الجداول ========== */
+.table-container { overflow-x: auto; }
+.table-container::-webkit-scrollbar { height: 6px; }
+.table-container::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+
+th {
+    padding: 14px 12px;
+    text-align: right;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    background: linear-gradient(180deg, rgba(201, 169, 97, 0.08), rgba(201, 169, 97, 0.02));
+    border-bottom: 2px solid var(--gold);
+    white-space: nowrap;
+}
+
+td {
+    padding: 12px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+tbody tr { transition: var(--transition); }
+tbody tr:hover { background: linear-gradient(90deg, rgba(201, 169, 97, 0.04), transparent); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* ========== الشارات ========== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-success { background: var(--success-bg); color: #047857; }
+.badge-danger { background: var(--danger-bg); color: #b91c1c; }
+.badge-warning { background: var(--warning-bg); color: #b45309; }
+.badge-info { background: var(--info-bg); color: #1d4ed8; }
+.badge-purple { background: rgba(139, 92, 246, 0.15); color: #6d28d9; }
+.badge-gold { background: rgba(201, 169, 97, 0.15); color: var(--gold-dark); }
+
+/* ========== النماذج ========== */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    padding: 14px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+}
+
+.input {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem;
+    background: var(--card-bg);
+    color: var(--text);
+    transition: var(--transition);
+    min-width: 150px;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201, 169, 97, 0.12);
+}
+
+.input::placeholder { color: var(--text-muted); }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.form-group { margin-bottom: 4px; }
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.form-group label .required { color: var(--danger); margin-right: 3px; }
+.form-group .input { width: 100%; min-width: 0; }
+
+.form-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--gold-dark);
+    margin: 18px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ========== النوافذ المنبثقة ========== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.75);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    padding: 20px;
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 800px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(201, 169, 97, 0.2);
+}
+
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+@keyframes modalIn {
+    from { transform: scale(0.9) translateY(30px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    padding: 22px 26px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-medium));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h3::before {
+    content: '';
+    width: 4px; height: 22px;
+    background: var(--gold-gradient);
+    border-radius: 2px;
+}
+
+.modal-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover { background: rgba(239, 68, 68, 0.8); transform: rotate(90deg); }
+
+.modal-body { padding: 26px; }
+
+.modal-footer {
+    padding: 18px 26px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    background: var(--card-bg);
+}
+
+/* ========== ملخص التكلفة ========== */
+.cost-summary {
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.08), rgba(201, 169, 97, 0.02));
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 14px;
+    border: 1px solid rgba(201, 169, 97, 0.25);
+}
+
+.cost-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed rgba(201, 169, 97, 0.2);
+}
+
+.cost-row:last-child { border-bottom: none; }
+
+.cost-row.total {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 2px solid var(--gold);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--gold-dark);
+    font-family: 'Playfair Display', serif;
+}
+
+.cost-row.remaining { color: var(--danger); font-weight: 700; }
+.cost-row.paid-amount { color: var(--success); font-weight: 700; }
+
+/* ========== بطاقة الحجز (Card View) ========== */
+.booking-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.booking-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.booking-card-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(201, 169, 97, 0.04), transparent);
+}
+
+.booking-card-header .room-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.booking-card-header .room-num .room-type-badge {
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    background: rgba(201, 169, 97, 0.15);
+    color: var(--gold-dark);
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.booking-card-body {
+    padding: 0 20px 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.booking-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.booking-info-item .label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.booking-info-item .value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.booking-card-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--bg);
+}
+
+.booking-card-footer .payment-info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.booking-card-footer .payment-info .amount {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.booking-card-footer .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ========== واجهة الإعدادات ========== */
+.settings-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 22px;
+    background: var(--card-bg);
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    width: fit-content;
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.settings-tab {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.settings-tab:hover { color: var(--gold); }
+
+.settings-tab.active {
+    background: var(--gold-gradient);
+    color: var(--navy);
+    box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+}
+
+.settings-panel { display: none; }
+.settings-panel.active { display: block; animation: sectionIn 0.4s ease; }
+
+/* ========== من نحن ========== */
+.about-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-medium) 100%);
+    border-radius: var(--radius-lg);
+    padding: 40px 32px;
+    margin-bottom: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(201, 169, 97, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.about-hero h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.about-hero p {
+    color: var(--gold-light);
+    font-size: 0.95rem;
+    position: relative;
+}
+
+.dev-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
+.dev-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.dev-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100%; height: 4px;
+    background: var(--gold-gradient);
+}
+
+.dev-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.dev-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 18px;
+    box-shadow: 0 10px 30px rgba(201, 169, 97, 0.35);
+    color: var(--navy);
+    font-weight: 900;
+    font-family: 'Playfair Display', serif;
+}
+
+.dev-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    color: var(--text);
+}
+
+.dev-card .role {
+    font-size: 0.82rem;
+    color: var(--gold-dark);
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+}
+
+.dev-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.dev-contact a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: rgba(201, 169, 97, 0.08);
+    border: 1px solid rgba(201, 169, 97, 0.25);
+    border-radius: 12px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    direction: ltr;
+}
+
+.dev-contact a:hover {
+    background: var(--gold-gradient);
+    color: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 169, 97, 0.35);
+}
+
+.dev-contact a .phone-icon {
+    font-size: 1.1rem;
+}
+
+.tech-badges {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.tech-badge {
+    padding: 6px 16px;
+    background: rgba(201, 169, 97, 0.1);
+    border: 1px solid rgba(201, 169, 97, 0.3);
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gold-dark);
+}
+
+/* ========== الإشعار ========== */
+.toast {
+    position: fixed;
+    bottom: 26px;
+    left: 26px;
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: 0 20px 50px rgba(10, 22, 40, 0.35);
+    transform: translateY(120px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2000;
+    max-width: 380px;
+    border-right: 4px solid var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast::before {
+    content: '✓';
+    width: 26px; height: 26px;
+    background: var(--gold-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+    font-weight: 900;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error { border-right-color: var(--danger); }
+.toast.error::before { content: '✕'; background: var(--danger); color: #fff; }
+.toast.warning { border-right-color: var(--warning); }
+.toast.warning::before { content: '!'; background: var(--warning); color: #fff; }
+
+/* ========== شريط التقدم ========== */
+.payment-progress {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.payment-progress .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), #34d399);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+/* ========== تقارير ========== */
+.report-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 22px;
+    background: var(--card-bg);
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    width: fit-content;
+    border: 1px solid var(--border);
+}
+
+.report-tab {
+    padding: 10px 22px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.report-tab.active {
+    background: var(--gold-gradient);
+    color: var(--navy);
+    box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+}
+
+/* ========== شبكة الغرف ========== */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    padding: 20px;
+}
+
+.room-tile {
+    padding: 16px 10px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.room-tile:hover { transform: translateY(-3px) scale(1.03); box-shadow: var(--shadow-lg); }
+
+.room-tile.available { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #6ee7b7; }
+.room-tile.occupied { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-color: #fca5a5; }
+.room-tile.maintenance { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fcd34d; }
+
+.room-tile .room-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 3px;
+}
+
+.room-tile .room-type { font-size: 0.68rem; color: var(--text-light); font-weight: 600; }
+
+/* ========== الطباعة ========== */
+@media print {
+    .sidebar, .filter-bar, .btn, .modal-footer, .settings-tabs { display: none !important; }
+    .main-content { margin-right: 0; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+}
+
+/* ========== الاستجابة ========== */
+@media (max-width: 1024px) {
+    .sidebar { width: 80px; }
+    .sidebar-header h1, .sidebar-header p, .nav-link span:not(.icon) { display: none; }
+    .nav-link { justify-content: center; padding: 14px; }
+    .sidebar-header { padding: 18px 8px; }
+    .logo-mark { width: 42px; height: 42px; font-size: 1.2rem; }
+    .hotel-config { display: none; }
+    .main-content { margin-right: 80px; padding: 20px; }
+}
+
+@media (max-width: 640px) {
+    .main-content { padding: 14px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .hero-header { padding: 20px; }
+    .hero-date h2 { font-size: 1.3rem; }
+    .hero-host { width: 100%; }
+    .filter-bar { flex-direction: column; }
+    .input { width: 100%; }
+    .modal-content { max-width: 100%; }
+    .dev-cards { grid-template-columns: 1fr; }
+    .booking-card-body { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== الشريط الجانبي ========== -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-mark">🏨</div>
+        <h1>Grand Palace</h1>
+        <p>Hotel Management</p>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" data-section="dashboard">
+            <span class="icon">📊</span><span>لوحة التحكم</span>
+        </a>
+        <a href="#" class="nav-link" data-section="reservations">
+            <span class="icon">📋</span><span>الحجوزات</span>
+        </a>
+        <a href="#" class="nav-link" data-section="rooms">
+            <span class="icon">🛏️</span><span>الغرف</span>
+        </a>
+        <a href="#" class="nav-link" data-section="payments">
+            <span class="icon">💳</span><span>المدفوعات</span>
+        </a>
+        <a href="#" class="nav-link" data-section="reports">
+            <span class="icon">📈</span><span>التقارير</span>
+        </a>
+        <a href="#" class="nav-link" data-section="settings">
+            <span class="icon">⚙️</span><span>الإعدادات</span>
+        </a>
+        <a href="#" class="nav-link" data-section="about">
+            <span class="icon">ℹ️</span><span>من نحن</span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="hotel-config">
+            <label>👤 اسم المضيف</label>
+            <input type="text" id="hostNameInput" value="المدير العام">
+        </div>
+        <button id="themeToggle" class="btn btn-outline btn-sm" style="width:100%">🌙 الوضع الليلي</button>
+    </div>
+</aside>
+
+<!-- ========== المحتوى الرئيسي ========== -->
+<main class="main-content">
+
+    <!-- ===== لوحة التحكم ===== -->
+    <section id="dashboard" class="section active">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2 id="todayDate">جاري التحميل...</h2>
+                    <p id="todayDay">اليوم</p>
+                </div>
+                <div class="hero-host">
+                    <div class="label">اسم المضيف</div>
+                    <div class="value" id="displayHostName">المدير العام</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card gold">
+                <div class="stat-header"><div class="stat-icon">🛏️</div></div>
+                <div class="stat-value" id="statTotalRooms">0</div>
+                <div class="stat-label">إجمالي الغرف</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header"><div class="stat-icon">✅</div></div>
+                <div class="stat-value" id="statAvailableRooms">0</div>
+                <div class="stat-label">غرف شاغرة</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-header"><div class="stat-icon">🔴</div></div>
+                <div class="stat-value" id="statOccupiedRooms">0</div>
+                <div class="stat-label">غرف مشغولة</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-header"><div class="stat-icon">📋</div></div>
+                <div class="stat-value" id="statActiveReservations">0</div>
+                <div class="stat-label">حجوزات نشطة</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-header"><div class="stat-icon">💰</div></div>
+                <div class="stat-value" id="statTodayRevenue">0</div>
+                <div class="stat-label">إيرادات اليوم</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-header"><div class="stat-icon">⚠️</div></div>
+                <div class="stat-value" id="statUnpaidAmount">0</div>
+                <div class="stat-label">مبالغ غير واصلة</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>حالة الغرف الآن</h3>
+                <div style="display:flex;gap:8px;font-size:0.72rem;color:var(--text-light)">
+                    <span class="badge badge-success">شاغرة</span>
+                    <span class="badge badge-danger">مشغولة</span>
+                    <span class="badge badge-warning">صيانة</span>
+                </div>
+            </div>
+            <div id="roomStatusGrid" class="room-grid"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>الحجوزات النشطة</h3>
+                <button class="btn btn-sm btn-primary" onclick="exportToCSV('reservations')">📥 تصدير CSV</button>
+            </div>
+            <div style="padding:20px" id="activeReservationsContainer"></div>
+        </div>
+    </section>
+
+    <!-- ===== الحجوزات ===== -->
+    <section id="reservations" class="section">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2>📋 إدارة الحجوزات</h2>
+                    <p>إضافة وتعديل ومتابعة جميع الحجوزات</p>
+                </div>
+                <button class="btn btn-primary" onclick="openReservationModal()" style="font-size:0.95rem;padding:13px 26px">
+                    ➕ حجز جديد
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="resSearch" placeholder="🔍 بحث بالاسم أو رقم الغرفة أو الهاتف..." class="input" style="flex:1;min-width:200px">
+            <select id="resStatusFilter" class="input">
+                <option value="">جميع الحالات</option>
+                <option value="نشط">نشط</option>
+                <option value="غادر">غادر</option>
+                <option value="ملغي">ملغي</option>
+            </select>
+            <select id="resPaymentFilter" class="input">
+                <option value="">جميع حالات الدفع</option>
+                <option value="واصل بالكامل">واصل بالكامل</option>
+                <option value="واصل جزئياً">واصل جزئياً</option>
+                <option value="غير واصل">غير واصل</option>
+            </select>
+        </div>
+
+        <div id="reservationsListContainer"></div>
+    </section>
+
+    <!-- ===== الغرف ===== -->
+    <section id="rooms" class="section">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2>🛏️ إدارة الغرف</h2>
+                    <p>إضافة وتعديل الغرف وأنواعها وأسعارها</p>
+                </div>
+                <button class="btn btn-primary" onclick="openRoomModal()" style="font-size:0.95rem;padding:13px 26px">
+                    ➕ إضافة غرفة
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الغرفة</th>
+                            <th>النوع</th>
+                            <th>الطابق</th>
+                            <th>السعر / ليلة</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== المدفوعات ===== -->
+    <section id="payments" class="section">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2>💳 سجل المدفوعات</h2>
+                    <p>متابعة المبالغ الواصلة والمتبقية</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card green">
+                <div class="stat-header"><div class="stat-icon">✅</div></div>
+                <div class="stat-value" id="totalPaidAll">0</div>
+                <div class="stat-label">إجمالي الواصل</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-header"><div class="stat-icon">⏳</div></div>
+                <div class="stat-value" id="totalRemainingAll">0</div>
+                <div class="stat-label">إجمالي المتبقي</div>
+            </div>
+            <div class="stat-card gold">
+                <div class="stat-header"><div class="stat-icon">💵</div></div>
+                <div class="stat-value" id="totalRevenueAll">0</div>
+                <div class="stat-label">إجمالي التكاليف</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>تفاصيل المدفوعات</h3></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الغرفة</th>
+                            <th>النزيل</th>
+                            <th>الإجمالي</th>
+                            <th>الواصل</th>
+                            <th>الباقي</th>
+                            <th>الحالة</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== التقارير ===== -->
+    <section id="reports" class="section">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2>📈 التقارير والإحصائيات</h2>
+                    <p>تقارير يومية وأسبوعية وشهرية شاملة</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة التقرير</button>
+            </div>
+        </div>
+
+        <div class="report-tabs">
+            <button class="report-tab active" onclick="switchReport('daily', this)">📅 يومي</button>
+            <button class="report-tab" onclick="switchReport('weekly', this)">📆 أسبوعي</button>
+            <button class="report-tab" onclick="switchReport('monthly', this)">🗓️ شهري</button>
+        </div>
+
+        <div id="reportContent"></div>
+    </section>
+
+    <!-- ===== الإعدادات ===== -->
+    <section id="settings" class="section">
+        <div class="hero-header">
+            <div class="hero-content">
+                <div class="hero-date">
+                    <h2>⚙️ الإعدادات</h2>
+                    <p>تعديل أسعار الغرف والخدمات وبيانات النظام</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-tabs">
+            <button class="settings-tab active" onclick="switchSettingsTab('general', this)">🏨 عام</button>
+            <button class="settings-tab" onclick="switchSettingsTab('roomPrices', this)">🛏️ أسعار الغرف</button>
+            <button class="settings-tab" onclick="switchSettingsTab('services', this)">🔧 أسعار الخدمات</button>
+            <button class="settings-tab" onclick="switchSettingsTab('data', this)">💾 البيانات</button>
+        </div>
+
+        <!-- تبويب عام -->
+        <div id="settings-general" class="settings-panel active">
+            <div class="card">
+                <div class="card-header"><h3>معلومات الفندق الأساسية</h3></div>
+                <div style="padding:24px">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>اسم الفندق</label>
+                            <input type="text" class="input" id="settingHotelName" value="Grand Palace Hotel">
+                        </div>
+                        <div class="form-group">
+                            <label>اسم المضيف / المدير</label>
+                            <input type="text" class="input" id="settingHostName" value="المدير العام">
+                        </div>
+                        <div class="form-group">
+                            <label>العملة</label>
+                            <input type="text" class="input" id="settingCurrency" value="ر.س">
+                        </div>
+                        <div class="form-group">
+                            <label>نسبة الضريبة (%)</label>
+                            <input type="number" class="input" id="settingTax" value="0" min="0" max="100">
+                        </div>
+                    </div>
+                    <div style="margin-top:20px">
+                        <button class="btn btn-primary" onclick="saveGeneralSettings()">💾 حفظ الإعدادات</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب أسعار الغرف -->
+        <div id="settings-roomPrices" class="settings-panel">
+            <div class="card">
+                <div class="card-header">
+                    <h3>تعديل أسعار الغرف</h3>
+                    <span style="font-size:0.78rem;color:var(--text-light)">عدّل السعر ثم اضغط حفظ بجانب الغرفة</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الغرفة</th>
+                                <th>النوع</th>
+                                <th>الطابق</th>
+                                <th>السعر الحالي</th>
+                                <th>السعر الجديد</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roomPricesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب أسعار الخدمات -->
+        <div id="settings-services" class="settings-panel">
+            <div class="card">
+                <div class="card-header"><h3>أسعار الخدمات الإضافية</h3></div>
+                <div style="padding:24px">
+                    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:20px">
+                        هذه الأسعار تُستخدم كقيم افتراضية عند إنشاء حجز جديد، ويمكن تعديلها يدوياً لكل حجز.
+                    </p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>👔 سعر خدمة المصبغة (لليوم / للقطعة)</label>
+                            <input type="number" class="input" id="settingLaundryPrice" value="50" min="0" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>🍽️ سعر خدمة البوفيه (لليوم / للشخص)</label>
+                            <input type="number" class="input" id="settingBuffetPrice" value="80" min="0" step="0.5">
+                        </div>
+                    </div>
+                    <div style="margin-top:20px">
+                        <button class="btn btn-primary" onclick="saveServicePrices()">💾 حفظ أسعار الخدمات</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب البيانات -->
+        <div id="settings-data" class="settings-panel">
+            <div class="card">
+                <div class="card-header"><h3>إدارة البيانات</h3></div>
+                <div style="padding:24px;display:flex;gap:12px;flex-wrap:wrap">
+                    <button class="btn btn-navy" onclick="exportAllData()">📦 تصدير نسخة احتياطية (JSON)</button>
+                    <button class="btn btn-outline" onclick="importData()">📥 استيراد نسخة</button>
+                    <button class="btn btn-danger" onclick="resetAllData()">🗑️ مسح كل البيانات</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== من نحن ===== -->
+    <section id="about" class="section">
+        <div class="about-hero">
+            <h2>🏨 Grand Palace Hotel</h2>
+            <p>نظام إدارة الفنادق المتكامل — نسخة 3.0</p>
+        </div>
+
+        <div class="dev-cards">
+            <div class="dev-card">
+                <div class="dev-avatar">م</div>
+                <h3>م. محمود الجاسم</h3>
+                <div class="role">مبرمج ومطور النظام</div>
+                <div class="dev-contact">
+                    <a href="tel:+963967172311">
+                        <span class="phone-icon">📞</span>
+                        +963 967 172 311
+                    </a>
+                    <a href="https://wa.me/963967172311" target="_blank">
+                        <span class="phone-icon">💬</span>
+                        واتساب
+                    </a>
+                </div>
+            </div>
+
+            <div class="dev-card">
+                <div class="dev-avatar">م</div>
+                <h3>محمد الأشرم</h3>
+                <div class="role">مبرمج ومطور النظام</div>
+                <div class="dev-contact">
+                    <a href="tel:0939305141">
+                        <span class="phone-icon">📞</span>
+                        0939 305 141
+                    </a>
+                    <a href="https://wa.me/963939305141" target="_blank">
+                        <span class="phone-icon">💬</span>
+                        واتساب
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>عن النظام</h3></div>
+            <div style="padding:24px">
+                <p style="font-size:0.9rem;line-height:1.9;color:var(--text-light)">
+                    نظام <strong style="color:var(--gold-dark)">Grand Palace Hotel</strong> هو نظام إدارة فنادق متكامل 
+                    يعمل بالكامل في المتصفح، مصمم لتسهيل العمليات اليومية للفنادق الصغيرة والمتوسطة. 
+                    يوفر النظام إدارة شاملة للحجوزات، الغرف، المدفوعات، والتقارير الدورية، 
+                    مع واجهة عربية أنيقة ودعم كامل للوضع الليلي، ومزامنة سحابية لحظية عبر Firebase Firestore.
+                </p>
+                <div class="tech-badges">
+                    <span class="tech-badge">HTML5</span>
+                    <span class="tech-badge">CSS3</span>
+                    <span class="tech-badge">JavaScript</span>
+                    <span class="tech-badge">Firebase Firestore</span>
+                    <span class="tech-badge">Responsive Design</span>
+                    <span class="tech-badge">RTL Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ========== نافذة الحجز (خطوات) ========== -->
+<div class="modal" id="reservationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="resModalTitle">حجز جديد</h3>
+            <button class="modal-close" onclick="closeModal('reservationModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="resEditId">
+
+            <!-- شريط الخطوات -->
+            <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+                <div class="step-indicator active" id="step1Indicator" style="flex:1;padding:10px;background:rgba(201,169,97,0.1);border-radius:10px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--gold-dark)">
+                    👤 بيانات النزيل
+                </div>
+                <div class="step-indicator" id="step2Indicator" style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--text-muted)">
+                    🛏️ الغرفة والإقامة
+                </div>
+                <div class="step-indicator" id="step3Indicator" style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--text-muted)">
+                    💰 التكاليف والدفع
+                </div>
+            </div>
+
+            <!-- الخطوة 1: النزيل -->
+            <div id="step1" class="form-step">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم النزيل <span class="required">*</span></label>
+                        <input type="text" id="resGuestName" class="input" placeholder="الاسم الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label>الجنسية</label>
+                        <input type="text" id="resNationality" class="input" placeholder="مثال: سعودي، مصري، سوري">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف <span class="required">*</span></label>
+                        <input type="tel" id="resPhone" class="input" placeholder="05xxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>صفة النزيل</label>
+                        <select id="resGuestType" class="input">
+                            <option value="عادي">عادي</option>
+                            <option value="VIP">VIP</option>
+                            <option value="شركة">شركة</option>
+                            <option value="مجموعة">مجموعة</option>
+                            <option value="عائلة">عائلة</option>
+                            <option value="حكومي">حكومي</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخطوة 2: الغرفة -->
+            <div id="step2" class="form-step" style="display:none">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>رقم الغرفة <span class="required">*</span></label>
+                        <select id="resRoomId" class="input"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع الغرفة</label>
+                        <input type="text" id="resRoomType" class="input" readonly style="background:var(--bg)">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ القدوم</label>
+                        <input type="date" id="resArrivalDate" class="input">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الدخول <span class="required">*</span></label>
+                        <input type="date" id="resCheckIn" class="input">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ المغادرة <span class="required">*</span></label>
+                        <input type="date" id="resCheckOut" class="input">
+                    </div>
+                    <div class="form-group">
+                        <label>عدد الأيام</label>
+                        <input type="number" id="resDays" class="input" readonly style="background:var(--bg)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخطوة 3: الدفع -->
+            <div id="step3" class="form-step" style="display:none">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>سلفة مقدمة</label>
+                        <input type="number" id="resAdvance" class="input" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>تكلفة الإقامة</label>
+                        <input type="number" id="resAccommodation" class="input" value="0" readonly style="background:var(--bg)">
+                    </div>
+                    <div class="form-group">
+                        <label>خدمات مصبغة</label>
+                        <input type="number" id="resLaundry" class="input" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>خدمات بوفيه</label>
+                        <input type="number" id="resBuffet" class="input" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ الواصل</label>
+                        <input type="number" id="resPaid" class="input" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>طريقة الدفع</label>
+                        <select id="resPaymentMethod" class="input">
+                            <option value="نقدي">نقدي</option>
+                            <option value="بطاقة">بطاقة ائتمان</option>
+                            <option value="تحويل">تحويل بنكي</option>
+                            <option value="آجل">آجل</option>
+                            <option value="شيك">شيك</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:12px">
+                    <label>ملاحظات</label>
+                    <textarea id="resNotes" class="input" rows="2" placeholder="أي ملاحظات إضافية..."></textarea>
+                </div>
+                <div id="resCostSummary"></div>
+            </div>
+        </div>
+        <div class="modal-footer" style="justify-content:space-between">
+            <button class="btn btn-outline" id="prevStepBtn" onclick="prevStep()" style="display:none">← السابق</button>
+            <div style="display:flex;gap:10px;margin-right:auto">
+                <button class="btn btn-outline" onclick="closeModal('reservationModal')">إلغاء</button>
+                <button class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">التالي →</button>
+                <button class="btn btn-primary" id="saveResBtn" onclick="saveReservation()" style="display:none">💾 حفظ الحجز</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== نافذة الغرفة ========== -->
+<div class="modal" id="roomModal">
+    <div class="modal-content" style="max-width:500px">
+        <div class="modal-header">
+            <h3 id="roomModalTitle">إضافة غرفة جديدة</h3>
+            <button class="modal-close" onclick="closeModal('roomModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="roomEditId">
+            <div class="form-group">
+                <label>رقم الغرفة <span class="required">*</span></label>
+                <input type="text" id="roomNumber" class="input" placeholder="مثال: 101">
+            </div>
+            <div class="form-group">
+                <label>نوع الغرفة <span class="required">*</span></label>
+                <select id="roomType" class="input">
+                    <option value="مفردة">مفردة</option>
+                    <option value="ثنائية">ثنائية</option>
+                    <option value="ثلاثية">ثلاثية</option>
+                    <option value="سويت">سويت</option>
+                    <option value="جناح">جناح</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الطابق <span class="required">*</span></label>
+                <input type="number" id="roomFloor" class="input" min="1" placeholder="1">
+            </div>
+            <div class="form-group">
+                <label>السعر لليلة <span class="required">*</span></label>
+                <input type="number" id="roomPrice" class="input" min="0" step="0.01" placeholder="250">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('roomModal')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveRoom()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== نافذة الدفع ========== -->
+<div class="modal" id="paymentModal">
+    <div class="modal-content" style="max-width:440px">
+        <div class="modal-header">
+            <h3>💳 تسجيل دفعة</h3>
+            <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="payResId">
+            <div class="cost-summary" id="paySummary"></div>
+            <div class="form-group" style="margin-top:16px">
+                <label>المبلغ المراد إضافته للواصل</label>
+                <input type="number" id="payAmount" class="input" min="0" step="0.01">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('paymentModal')">إلغاء</button>
+            <button class="btn btn-success" onclick="confirmPayment()">✓ تأكيد الدفع</button>
+        </div>
+    </div>
+</div>
+
+<!-- الإشعار -->
+<div id="toast" class="toast"></div>
+
+<!-- ========== Firebase SDK (compat) ========== -->
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics-compat.js"></script>
+
+<script>
+/* ============================================================
+   Grand Palace Hotel — نظام إدارة الفندق
+   مع Firebase Firestore (مزامنة سحابية لحظية)
+   ============================================================ */
+
+// ===== الإعدادات الافتراضية =====
+const DEFAULT_SETTINGS = {
+    hotelName: 'Grand Palace Hotel',
+    hostName: 'المدير العام',
+    currency: 'ر.س',
+    taxRate: 0,
+    laundryPrice: 50,
+    buffetPrice: 80
+};
+
+const DEFAULT_ROOMS = [
+    { id: 1, number: '101', type: 'مفردة', floor: 1, price: 250, status: 'متاحة' },
+    { id: 2, number: '102', type: 'ثنائية', floor: 1, price: 400, status: 'متاحة' },
+    { id: 3, number: '103', type: 'ثلاثية', floor: 1, price: 550, status: 'متاحة' },
+    { id: 4, number: '201', type: 'مفردة', floor: 2, price: 280, status: 'متاحة' },
+    { id: 5, number: '202', type: 'ثنائية', floor: 2, price: 450, status: 'متاحة' },
+    { id: 6, number: '203', type: 'سويت', floor: 2, price: 900, status: 'متاحة' },
+    { id: 7, number: '301', type: 'جناح', floor: 3, price: 1800, status: 'متاحة' },
+    { id: 8, number: '302', type: 'سويت', floor: 3, price: 1100, status: 'متاحة' },
+];
+
+/* ============================================================
+   Firebase / Firestore
+   ============================================================ */
+const firebaseConfig = {
+    apiKey: "AIzaSyAL3oj_7XMqL97dHFU1_XOx4LP2xYQV7qU",
+    authDomain: "fndk-114b0.firebaseapp.com",
+    projectId: "fndk-114b0",
+    storageBucket: "fndk-114b0.firebasestorage.app",
+    messagingSenderId: "877870925464",
+    appId: "1:877870925464:web:dd60475b999a60704cf2ed",
+    measurementId: "G-MLHKJ2TSQH"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// التحليلات (اختياري — لا يكسر التطبيق إن فشل)
+try { firebase.analytics(); } catch (e) { console.warn('Analytics غير متاح:', e); }
+
+// مراجع Firestore
+const REF_SETTINGS     = db.doc('hotel/settings');
+const REF_META         = db.doc('hotel/meta');
+const COL_ROOMS        = db.collection('rooms');
+const COL_RESERVATIONS = db.collection('reservations');
+
+// ===== قاعدة البيانات المحلية (مرآة لـ Firestore) =====
+const DB = {
+    settings: { ...DEFAULT_SETTINGS },
+    rooms: [],
+    reservations: [],
+    nextRoomId: 1,
+    nextResId: 1,
+    ready: false
+};
+
+// ===== حفظ الإعدادات =====
+let _saveSettingsTimer = null;
+function saveSettings() {
+    clearTimeout(_saveSettingsTimer);
+    _saveSettingsTimer = setTimeout(() => {
+        REF_SETTINGS.set({ ...DB.settings })
+            .catch(err => { console.error(err); showToast('فشل حفظ الإعدادات', 'error'); });
+    }, 400);
+}
+
+// ===== حفظ العدّادات =====
+function saveMeta() {
+    REF_META.set({ nextRoomId: DB.nextRoomId, nextResId: DB.nextResId })
+        .catch(err => console.error(err));
+}
+
+// ===== مزامنة مجموعة كاملة (إضافة / تحديث / حذف) =====
+async function syncCollection(colName, items) {
+    const col  = db.collection(colName);
+    const snap = await col.get();
+    const ids  = new Set(items.map(r => String(r.id)));
+    const ops  = [];
+
+    snap.forEach(d => { if (!ids.has(d.id)) ops.push({ del: d.ref }); });
+
+    items.forEach(r => {
+        const data = { ...r };
+        delete data.id;
+        ops.push({ set: col.doc(String(r.id)), data });
+    });
+
+    // Firestore يقبل 500 عملية كحد أقصى لكل دفعة
+    for (let i = 0; i < ops.length; i += 400) {
+        const batch = db.batch();
+        ops.slice(i, i + 400).forEach(op => {
+            if (op.del) batch.delete(op.del);
+            else batch.set(op.set, op.data);
+        });
+        await batch.commit();
+    }
+}
+
+async function saveRooms() {
+    try { await syncCollection('rooms', DB.rooms); }
+    catch (err) { console.error(err); showToast('فشل حفظ الغرف', 'error'); }
+}
+
+async function saveReservations() {
+    try { await syncCollection('reservations', DB.reservations); }
+    catch (err) { console.error(err); showToast('فشل حفظ الحجوزات', 'error'); }
+}
+
+// ===== تحميل كل البيانات من Firestore =====
+async function loadFromCloud() {
+    const [settingsSnap, metaSnap, roomsSnap, resSnap] = await Promise.all([
+        REF_SETTINGS.get(), REF_META.get(), COL_ROOMS.get(), COL_RESERVATIONS.get()
+    ]);
+
+    // الإعدادات
+    if (settingsSnap.exists) {
+        DB.settings = { ...DEFAULT_SETTINGS, ...settingsSnap.data() };
+    } else {
+        DB.settings = { ...DEFAULT_SETTINGS };
+        await REF_SETTINGS.set({ ...DB.settings });
+    }
+
+    // الغرف
+    DB.rooms = roomsSnap.docs
+        .map(d => ({ id: Number(d.id), ...d.data() }))
+        .sort((a, b) => a.id - b.id);
+
+    if (roomsSnap.empty) {                       // أول تشغيل → زرع الغرف الافتراضية
+        DB.rooms = DEFAULT_ROOMS.map(r => ({ ...r }));
+        await syncCollection('rooms', DB.rooms);
+    }
+
+    // الحجوزات
+    DB.reservations = resSnap.docs
+        .map(d => ({ id: Number(d.id), ...d.data() }))
+        .sort((a, b) => a.id - b.id);
+
+    // العدّادات
+    const meta = metaSnap.exists ? metaSnap.data() : {};
+    DB.nextRoomId = meta.nextRoomId ||
+        (DB.rooms.reduce((m, r) => Math.max(m, r.id), 0) + 1);
+    DB.nextResId  = meta.nextResId ||
+        (DB.reservations.reduce((m, r) => Math.max(m, r.id), 0) + 1);
+
+    await REF_META.set({ nextRoomId: DB.nextRoomId, nextResId: DB.nextResId });
+    DB.ready = true;
+}
+
+// ===== تحديث الواجهة الحالية =====
+function refreshCurrentView() {
+    const active = document.querySelector('.section.active');
+    if (!active) return;
+    switch (active.id) {
+        case 'dashboard':    renderDashboard();  break;
+        case 'reservations': renderReservations(); break;
+        case 'rooms':        renderRooms();      break;
+        case 'payments':     renderPayments();   break;
+        case 'reports':      renderReport(currentReport); break;
+        case 'settings':     renderRoomPrices(); break;
+    }
+}
+
+// ===== مزامنة لحظية (تحديث تلقائي بين الأجهزة) =====
+function attachRealtimeListeners() {
+    COL_ROOMS.onSnapshot(snap => {
+        DB.rooms = snap.docs
+            .map(d => ({ id: Number(d.id), ...d.data() }))
+            .sort((a, b) => a.id - b.id);
+        const maxId = DB.rooms.reduce((m, r) => Math.max(m, r.id), 0);
+        if (DB.nextRoomId <= maxId) DB.nextRoomId = maxId + 1;
+        refreshCurrentView();
+    }, err => console.error('rooms listener:', err));
+
+    COL_RESERVATIONS.onSnapshot(snap => {
+        DB.reservations = snap.docs
+            .map(d => ({ id: Number(d.id), ...d.data() }))
+            .sort((a, b) => a.id - b.id);
+        const maxId = DB.reservations.reduce((m, r) => Math.max(m, r.id), 0);
+        if (DB.nextResId <= maxId) DB.nextResId = maxId + 1;
+        refreshCurrentView();
+    }, err => console.error('reservations listener:', err));
+
+    REF_SETTINGS.onSnapshot(doc => {
+        if (!doc.exists) return;
+        DB.settings = { ...DEFAULT_SETTINGS, ...doc.data() };
+        const dh = document.getElementById('displayHostName');
+        if (dh) dh.textContent = DB.settings.hostName;
+        const hi = document.getElementById('hostNameInput');
+        if (hi && document.activeElement !== hi) hi.value = DB.settings.hostName;
+    }, err => console.error('settings listener:', err));
+}
+
+// ===== أدوات =====
+function formatCurrency(amount) {
+    const n = Number(amount) || 0;
+    return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ' + DB.settings.currency;
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${day}/${m}/${y}`;
+}
+
+function todayISO() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function getNights(checkIn, checkOut) {
+    if (!checkIn || !checkOut) return 0;
+    const d1 = new Date(checkIn);
+    const d2 = new Date(checkOut);
+    return Math.max(0, Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)));
+}
+
+function paymentStatus(total, paid) {
+    if (paid >= total && total > 0) return 'واصل بالكامل';
+    if (paid > 0) return 'واصل جزئياً';
+    return 'غير واصل';
+}
+
+function paymentBadge(total, paid) {
+    const s = paymentStatus(total, paid);
+    const cls = s === 'واصل بالكامل' ? 'badge-success' : s === 'واصل جزئياً' ? 'badge-warning' : 'badge-danger';
+    return `<span class="badge ${cls}">${s}</span>`;
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ===== التنقل =====
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(section).classList.add('active');
+
+        if (section === 'dashboard') renderDashboard();
+        if (section === 'reservations') renderReservations();
+        if (section === 'rooms') renderRooms();
+        if (section === 'payments') renderPayments();
+        if (section === 'reports') renderReport('daily');
+        if (section === 'settings') { renderRoomPrices(); loadSettingsUI(); }
+    });
+});
+
+// ===== الوضع الليلي =====
+document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    document.getElementById('themeToggle').textContent = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+    localStorage.setItem('hms_theme', isDark ? 'dark' : 'light');
+});
+
+if (localStorage.getItem('hms_theme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('themeToggle').textContent = '☀️ الوضع النهاري';
+}
+
+// ===== اسم المضيف =====
+const hostInput = document.getElementById('hostNameInput');
+hostInput.addEventListener('input', e => {
+    DB.settings.hostName = e.target.value || 'المدير العام';
+    saveSettings();
+    document.getElementById('displayHostName').textContent = DB.settings.hostName;
+});
+
+// ===== التاريخ =====
+function updateTodayDate() {
+    const d = new Date();
+    const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    document.getElementById('todayDate').textContent = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    document.getElementById('todayDay').textContent = days[d.getDay()];
+    document.getElementById('displayHostName').textContent = DB.settings.hostName;
+}
+
+// ===== لوحة التحكم =====
+function renderDashboard() {
+    updateTodayDate();
+
+    const totalRooms = DB.rooms.length;
+    const occupied = DB.rooms.filter(r => r.status === 'مشغولة').length;
+    const available = DB.rooms.filter(r => r.status === 'متاحة').length;
+    const activeRes = DB.reservations.filter(r => r.status === 'نشط').length;
+
+    const today = todayISO();
+    const todayRevenue = DB.reservations
+        .filter(r => r.checkIn === today && r.status === 'نشط')
+        .reduce((s, r) => s + (r.paid || 0), 0);
+
+    const unpaid = DB.reservations
+        .filter(r => r.status === 'نشط')
+        .reduce((s, r) => s + (r.totalCost - r.paid), 0);
+
+    document.getElementById('statTotalRooms').textContent = totalRooms;
+    document.getElementById('statOccupiedRooms').textContent = occupied;
+    document.getElementById('statAvailableRooms').textContent = available;
+    document.getElementById('statActiveReservations').textContent = activeRes;
+    document.getElementById('statTodayRevenue').textContent = formatCurrency(todayRevenue);
+    document.getElementById('statUnpaidAmount').textContent = formatCurrency(unpaid);
+
+    // شبكة الغرف
+    document.getElementById('roomStatusGrid').innerHTML = DB.rooms.map(r => {
+        const cls = r.status === 'متاحة' ? 'available' : r.status === 'مشغولة' ? 'occupied' : 'maintenance';
+        return `
+            <div class="room-tile ${cls}">
+                <div class="room-num">${r.number}</div>
+                <div class="room-type">${r.type}</div>
+            </div>
+        `;
+    }).join('');
+
+    // الحجوزات النشطة (بطاقات)
+    const active = DB.reservations.filter(r => r.status === 'نشط');
+    document.getElementById('activeReservationsContainer').innerHTML = active.length
+        ? active.map(r => renderBookingCard(r)).join('')
+        : '<p style="text-align:center;padding:40px;color:var(--text-light)">لا توجد حجوزات نشطة حالياً</p>';
+}
+
+// ===== بطاقة الحجز =====
+function renderBookingCard(r, showActions = true) {
+    const remaining = r.totalCost - r.paid;
+    const pct = r.totalCost > 0 ? Math.min(100, (r.paid / r.totalCost) * 100) : 0;
+
+    return `
+        <div class="booking-card" onclick="toggleBookingDetails(${r.id})">
+            <div class="booking-card-header">
+                <div class="room-num">
+                    🛏️ ${r.roomNumber}
+                    <span class="room-type-badge">${r.roomType}</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                    ${paymentBadge(r.totalCost, r.paid)}
+                    <span class="badge ${r.status === 'نشط' ? 'badge-success' : r.status === 'غادر' ? 'badge-purple' : 'badge-danger'}">${r.status}</span>
+                </div>
+            </div>
+            <div class="booking-card-body">
+                <div class="booking-info-item">
+                    <span class="label">النزيل</span>
+                    <span class="value">${r.guestName}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الهاتف</span>
+                    <span class="value" style="direction:ltr">${r.phone}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الجنسية</span>
+                    <span class="value">${r.nationality || '-'}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الصفة</span>
+                    <span class="value"><span class="badge badge-gold">${r.guestType || 'عادي'}</span></span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">تاريخ الدخول</span>
+                    <span class="value">${formatDate(r.checkIn)}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">تاريخ المغادرة</span>
+                    <span class="value">${formatDate(r.checkOut)}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">عدد الأيام</span>
+                    <span class="value">${r.days} يوم</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الإجمالي</span>
+                    <span class="value">${formatCurrency(r.totalCost)}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الواصل</span>
+                    <span class="value" style="color:var(--success)">${formatCurrency(r.paid)}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="label">الباقي</span>
+                    <span class="value" style="color:var(--danger)">${formatCurrency(remaining)}</span>
+                </div>
+            </div>
+            <div class="booking-card-footer">
+                <div class="payment-info">
+                    <div>
+                        <div style="font-size:0.68rem;color:var(--text-muted)">نسبة السداد</div>
+                        <div class="payment-progress" style="width:120px">
+                            <div class="fill" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.68rem;color:var(--text-muted)">طريقة الدفع</div>
+                        <div class="amount">${r.paymentMethod}</div>
+                    </div>
+                </div>
+                ${showActions ? `
+                <div class="actions" onclick="event.stopPropagation()">
+                    ${r.status === 'نشط' ? `<button class="btn btn-sm btn-success" onclick="openPaymentModal(${r.id})">💳 دفع</button>` : ''}
+                    ${r.status === 'نشط' ? `<button class="btn btn-sm btn-navy" onclick="checkOut(${r.id})">🚪 مغادرة</button>` : ''}
+                    <button class="btn btn-sm btn-primary" onclick="editReservation(${r.id})">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteReservation(${r.id})">🗑️</button>
+                </div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function toggleBookingDetails(id) {
+    // يمكن إضافة تفاصيل إضافية لاحقاً
+}
+
+// ===== إدارة الغرف =====
+function renderRooms() {
+    document.getElementById('roomsBody').innerHTML = DB.rooms.map(r => {
+        const cls = r.status === 'متاحة' ? 'badge-success' : r.status === 'مشغولة' ? 'badge-danger' : 'badge-warning';
+        return `
+            <tr>
+                <td><strong style="font-family:Playfair Display">${r.number}</strong></td>
+                <td>${r.type}</td>
+                <td>${r.floor}</td>
+                <td>${formatCurrency(r.price)}</td>
+                <td><span class="badge ${cls}">${r.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="editRoom(${r.id})">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRoom(${r.id})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function openRoomModal(room = null) {
+    document.getElementById('roomModalTitle').textContent = room ? 'تعديل غرفة' : 'إضافة غرفة جديدة';
+    document.getElementById('roomEditId').value = room ? room.id : '';
+    document.getElementById('roomNumber').value = room ? room.number : '';
+    document.getElementById('roomType').value = room ? room.type : 'مفردة';
+    document.getElementById('roomFloor').value = room ? room.floor : '';
+    document.getElementById('roomPrice').value = room ? room.price : '';
+    openModal('roomModal');
+}
+
+function editRoom(id) {
+    const room = DB.rooms.find(r => r.id === id);
+    if (room) openRoomModal(room);
+}
+
+async function saveRoom() {
+    const id = document.getElementById('roomEditId').value;
+    const number = document.getElementById('roomNumber').value.trim();
+    const type = document.getElementById('roomType').value;
+    const floor = parseInt(document.getElementById('roomFloor').value);
+    const price = parseFloat(document.getElementById('roomPrice').value);
+
+    if (!number || !floor || !price) { showToast('يرجى ملء جميع الحقول', 'error'); return; }
+
+    if (id) {
+        const room = DB.rooms.find(r => r.id === parseInt(id));
+        Object.assign(room, { number, type, floor, price });
+        showToast('تم تحديث الغرفة');
+    } else {
+        DB.rooms.push({ id: DB.nextRoomId++, number, type, floor, price, status: 'متاحة' });
+        showToast('تمت إضافة الغرفة');
+    }
+    await saveRooms();
+    saveMeta();
+    closeModal('roomModal');
+    renderRooms();
+    renderRoomPrices();
+}
+
+async function deleteRoom(id) {
+    if (!confirm('هل أنت متأكد من حذف هذه الغرفة؟')) return;
+    DB.rooms = DB.rooms.filter(r => r.id !== id);
+    await saveRooms();
+    renderRooms();
+    showToast('تم حذف الغرفة', 'warning');
+}
+
+// ===== إدارة الحجوزات =====
+function renderReservations() {
+    const search = (document.getElementById('resSearch')?.value || '').toLowerCase();
+    const statusFilter = document.getElementById('resStatusFilter')?.value || '';
+    const payFilter = document.getElementById('resPaymentFilter')?.value || '';
+
+    let list = DB.reservations;
+    if (search) list = list.filter(r =>
+        r.guestName.toLowerCase().includes(search) ||
+        r.roomNumber.toLowerCase().includes(search) ||
+        (r.phone || '').includes(search)
+    );
+    if (statusFilter) list = list.filter(r => r.status === statusFilter);
+    if (payFilter) list = list.filter(r => paymentStatus(r.totalCost, r.paid) === payFilter);
+
+    document.getElementById('reservationsListContainer').innerHTML = list.length
+        ? list.slice().reverse().map(r => renderBookingCard(r)).join('')
+        : '<p style="text-align:center;padding:40px;color:var(--text-light)">لا توجد حجوزات</p>';
+}
+
+// ===== خطوات الحجز =====
+let currentStep = 1;
+
+function goToStep(step) {
+    currentStep = step;
+    document.querySelectorAll('.form-step').forEach(s => s.style.display = 'none');
+    document.getElementById(`step${step}`).style.display = 'block';
+
+    [1, 2, 3].forEach(i => {
+        const ind = document.getElementById(`step${i}Indicator`);
+        if (i === step) {
+            ind.style.background = 'rgba(201,169,97,0.15)';
+            ind.style.color = 'var(--gold-dark)';
+            ind.style.boxShadow = '0 0 0 2px var(--gold)';
+        } else {
+            ind.style.background = 'var(--bg)';
+            ind.style.color = 'var(--text-muted)';
+            ind.style.boxShadow = 'none';
+        }
+    });
+
+    document.getElementById('prevStepBtn').style.display = step > 1 ? 'inline-flex' : 'none';
+    document.getElementById('nextStepBtn').style.display = step < 3 ? 'inline-flex' : 'none';
+    document.getElementById('saveResBtn').style.display = step === 3 ? 'inline-flex' : 'none';
+}
+
+function nextStep() {
+    if (currentStep === 1) {
+        const name = document.getElementById('resGuestName').value.trim();
+        const phone = document.getElementById('resPhone').value.trim();
+        if (!name || !phone) { showToast('يرجى إدخال الاسم ورقم الهاتف', 'error'); return; }
+    }
+    if (currentStep === 2) {
+        const roomId = document.getElementById('resRoomId').value;
+        const checkIn = document.getElementById('resCheckIn').value;
+        const checkOut = document.getElementById('resCheckOut').value;
+        if (!roomId || !checkIn || !checkOut) { showToast('يرجى اختيار الغرفة والتواريخ', 'error'); return; }
+        if (new Date(checkOut) <= new Date(checkIn)) { showToast('تاريخ المغادرة يجب أن يكون بعد الدخول', 'error'); return; }
+        calculateCosts();
+    }
+    if (currentStep < 3) goToStep(currentStep + 1);
+}
+
+function prevStep() { if (currentStep > 1) goToStep(currentStep - 1); }
+
+// ===== فتح نافذة الحجز =====
+function openReservationModal() {
+    document.getElementById('resModalTitle').textContent = 'حجز جديد';
+    document.getElementById('resEditId').value = '';
+    ['resGuestName', 'resNationality', 'resPhone', 'resArrivalDate', 'resCheckIn', 'resCheckOut', 'resNotes'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('resGuestType').value = 'عادي';
+    document.getElementById('resAdvance').value = 0;
+    document.getElementById('resLaundry').value = 0;
+    document.getElementById('resBuffet').value = 0;
+    document.getElementById('resPaid').value = 0;
+    document.getElementById('resAccommodation').value = 0;
+    document.getElementById('resDays').value = 0;
+    document.getElementById('resPaymentMethod').value = 'نقدي';
+    document.getElementById('resCostSummary').innerHTML = '';
+    document.getElementById('resCheckIn').value = todayISO();
+
+    const select = document.getElementById('resRoomId');
+    const available = DB.rooms.filter(r => r.status === 'متاحة');
+    select.innerHTML = '<option value="">-- اختر الغرفة --</option>' +
+        available.map(r => `<option value="${r.id}">${r.number} - ${r.type} (${formatCurrency(r.price)}/ليلة)</option>`).join('');
+
+    goToStep(1);
+    openModal('reservationModal');
+}
+
+// ===== حساب التكاليف =====
+function calculateCosts() {
+    const roomId = parseInt(document.getElementById('resRoomId').value);
+    const checkIn = document.getElementById('resCheckIn').value;
+    const checkOut = document.getElementById('resCheckOut').value;
+
+    if (!roomId || !checkIn || !checkOut) return;
+
+    const room = DB.rooms.find(r => r.id === roomId);
+    if (!room) return;
+
+    const days = getNights(checkIn, checkOut);
+    const accommodation = room.price * days;
+    document.getElementById('resDays').value = days;
+    document.getElementById('resAccommodation').value = accommodation;
+
+    const laundry = parseFloat(document.getElementById('resLaundry').value) || 0;
+    const buffet = parseFloat(document.getElementById('resBuffet').value) || 0;
+    const paid = parseFloat(document.getElementById('resPaid').value) || 0;
+
+    const totalCost = accommodation + laundry + buffet;
+    const remaining = totalCost - paid;
+
+    document.getElementById('resCostSummary').innerHTML = `
+        <div class="cost-summary">
+            <div class="cost-row"><span>🛏️ الإقامة (${days} يوم × ${formatCurrency(room.price)})</span><span>${formatCurrency(accommodation)}</span></div>
+            <div class="cost-row"><span>👔 المصبغة</span><span>${formatCurrency(laundry)}</span></div>
+            <div class="cost-row"><span>🍽️ البوفيه</span><span>${formatCurrency(buffet)}</span></div>
+            <div class="cost-row total"><span>الإجمالي الكامل</span><span>${formatCurrency(totalCost)}</span></div>
+            <div class="cost-row paid-amount"><span>✅ الواصل</span><span>${formatCurrency(paid)}</span></div>
+            <div class="cost-row remaining"><span>⏳ المتبقي</span><span>${formatCurrency(remaining)}</span></div>
+        </div>
+    `;
+}
+
+// ===== حفظ الحجز =====
+async function saveReservation() {
+    const guestName = document.getElementById('resGuestName').value.trim();
+    const nationality = document.getElementById('resNationality').value.trim();
+    const phone = document.getElementById('resPhone').value.trim();
+    const guestType = document.getElementById('resGuestType').value;
+    const roomId = parseInt(document.getElementById('resRoomId').value);
+    const arrivalDate = document.getElementById('resArrivalDate').value;
+    const checkIn = document.getElementById('resCheckIn').value;
+    const checkOut = document.getElementById('resCheckOut').value;
+    const advance = parseFloat(document.getElementById('resAdvance').value) || 0;
+    const laundry = parseFloat(document.getElementById('resLaundry').value) || 0;
+    const buffet = parseFloat(document.getElementById('resBuffet').value) || 0;
+    const paid = parseFloat(document.getElementById('resPaid').value) || 0;
+    const paymentMethod = document.getElementById('resPaymentMethod').value;
+    const notes = document.getElementById('resNotes').value.trim();
+
+    if (!guestName || !phone || !roomId || !checkIn || !checkOut) {
+        showToast('يرجى ملء جميع الحقول المطلوبة', 'error'); return;
+    }
+
+    const room = DB.rooms.find(r => r.id === roomId);
+    if (!room) { showToast('الغرفة غير موجودة', 'error'); return; }
+
+    const days = getNights(checkIn, checkOut);
+    const accommodation = room.price * days;
+    const totalCost = accommodation + laundry + buffet;
+
+    const editId = document.getElementById('resEditId').value;
+
+    if (editId) {
+        const res = DB.reservations.find(r => r.id === parseInt(editId));
+        const oldRoomId = res.roomId;
+        Object.assign(res, {
+            guestName, nationality, phone, guestType,
+            roomId, roomNumber: room.number, roomType: room.type,
+            arrivalDate, checkIn, checkOut, days,
+            advance, accommodation, laundry, buffet, totalCost,
+            paid, paymentMethod, notes
+        });
+        if (oldRoomId !== roomId) {
+            const oldRoom = DB.rooms.find(r => r.id === oldRoomId);
+            if (oldRoom) oldRoom.status = 'متاحة';
+            if (res.status === 'نشط') room.status = 'مشغولة';
+        }
+        await saveReservations();
+        await saveRooms();
+        saveMeta();
+        closeModal('reservationModal');
+        renderReservations();
+        showToast('تم تحديث الحجز');
+    } else {
+        const newRes = {
+            id: DB.nextResId++,
+            guestName, nationality, phone, guestType,
+            roomId, roomNumber: room.number, roomType: room.type,
+            arrivalDate, checkIn, checkOut, days,
+            advance, accommodation, laundry, buffet, totalCost,
+            paid, paymentMethod, notes,
+            status: 'نشط',
+            createdAt: new Date().toISOString()
+        };
+        DB.reservations.push(newRes);
+        room.status = 'مشغولة';
+        await saveReservations();
+        await saveRooms();
+        saveMeta();
+        closeModal('reservationModal');
+        renderReservations();
+        showToast(`تم إنشاء الحجز #${newRes.id}`);
+    }
+}
+
+// ===== تعديل حجز =====
+function editReservation(id) {
+    const res = DB.reservations.find(r => r.id === id);
+    if (!res) return;
+
+    document.getElementById('resModalTitle').textContent = `تعديل الحجز #${id}`;
+    document.getElementById('resEditId').value = res.id;
+    document.getElementById('resGuestName').value = res.guestName;
+    document.getElementById('resNationality').value = res.nationality || '';
+    document.getElementById('resPhone').value = res.phone;
+    document.getElementById('resGuestType').value = res.guestType || 'عادي';
+    document.getElementById('resArrivalDate').value = res.arrivalDate || '';
+    document.getElementById('resCheckIn').value = res.checkIn;
+    document.getElementById('resCheckOut').value = res.checkOut;
+    document.getElementById('resAdvance').value = res.advance;
+    document.getElementById('resLaundry').value = res.laundry;
+    document.getElementById('resBuffet').value = res.buffet;
+    document.getElementById('resPaid').value = res.paid;
+    document.getElementById('resPaymentMethod').value = res.paymentMethod;
+    document.getElementById('resNotes').value = res.notes || '';
+    document.getElementById('resRoomType').value = res.roomType;
+
+    const select = document.getElementById('resRoomId');
+    const available = DB.rooms.filter(r => r.status === 'متاحة' || r.id === res.roomId);
+    select.innerHTML = available.map(r =>
+        `<option value="${r.id}" ${r.id === res.roomId ? 'selected' : ''}>${r.number} - ${r.type} (${formatCurrency(r.price)}/ليلة)</option>`
+    ).join('');
+
+    calculateCosts();
+    goToStep(1);
+    openModal('reservationModal');
+}
+
+// ===== مغادرة =====
+async function checkOut(id) {
+    const res = DB.reservations.find(r => r.id === id);
+    if (!res) return;
+    if (!confirm(`تسجيل مغادرة ${res.guestName}؟`)) return;
+    const room = DB.rooms.find(r => r.id === res.roomId);
+    if (room) room.status = 'متاحة';
+    res.status = 'غادر';
+    res.actualCheckOut = new Date().toISOString();
+    await saveReservations();
+    await saveRooms();
+    renderReservations();
+    renderDashboard();
+    showToast(`تم تسجيل مغادرة ${res.guestName}`);
+}
+
+async function deleteReservation(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا الحجز؟')) return;
+    const res = DB.reservations.find(r => r.id === id);
+    if (res && res.status === 'نشط') {
+        const room = DB.rooms.find(r => r.id === res.roomId);
+        if (room) room.status = 'متاحة';
+    }
+    DB.reservations = DB.reservations.filter(r => r.id !== id);
+    await saveReservations();
+    await saveRooms();
+    renderReservations();
+    renderDashboard();
+    showToast('تم حذف الحجز', 'warning');
+}
+
+// ===== المدفوعات =====
+function renderPayments() {
+    const totalPaid = DB.reservations.reduce((s, r) => s + r.paid, 0);
+    const totalCost = DB.reservations.reduce((s, r) => s + r.totalCost, 0);
+    document.getElementById('totalPaidAll').textContent = formatCurrency(totalPaid);
+    document.getElementById('totalRemainingAll').textContent = formatCurrency(totalCost - totalPaid);
+    document.getElementById('totalRevenueAll').textContent = formatCurrency(totalCost);
+
+    document.getElementById('paymentsBody').innerHTML = DB.reservations.length
+        ? DB.reservations.slice().reverse().map(r => {
+            const remaining = r.totalCost - r.paid;
+            const pct = r.totalCost > 0 ? Math.min(100, (r.paid / r.totalCost) * 100) : 0;
+            return `
+                <tr>
+                    <td><strong>${r.roomNumber}</strong></td>
+                    <td>${r.guestName}</td>
+                    <td>${formatCurrency(r.totalCost)}</td>
+                    <td style="color:var(--success);font-weight:700">${formatCurrency(r.paid)}</td>
+                    <td style="color:var(--danger);font-weight:700">${formatCurrency(remaining)}</td>
+                    <td>
+                        ${paymentBadge(r.totalCost, r.paid)}
+                        <div class="payment-progress" style="margin-top:4px"><div class="fill" style="width:${pct}%"></div></div>
+                    </td>
+                    <td>
+                        ${r.status === 'نشط' && remaining > 0
+                            ? `<button class="btn btn-sm btn-success" onclick="openPaymentModal(${r.id})">💳 دفع</button>` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('')
+        : '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-light)">لا توجد بيانات</td></tr>';
+}
+
+function openPaymentModal(id) {
+    const res = DB.reservations.find(r => r.id === id);
+    if (!res) return;
+    const remaining = res.totalCost - res.paid;
+    document.getElementById('payResId').value = id;
+    document.getElementById('payAmount').value = remaining;
+    document.getElementById('paySummary').innerHTML = `
+        <div class="cost-row"><span>النزيل</span><span>${res.guestName}</span></div>
+        <div class="cost-row"><span>الغرفة</span><span>${res.roomNumber}</span></div>
+        <div class="cost-row"><span>الإجمالي</span><span>${formatCurrency(res.totalCost)}</span></div>
+        <div class="cost-row paid-amount"><span>الواصل حالياً</span><span>${formatCurrency(res.paid)}</span></div>
+        <div class="cost-row remaining"><span>المتبقي</span><span>${formatCurrency(remaining)}</span></div>
+    `;
+    openModal('paymentModal');
+}
+
+async function confirmPayment() {
+    const id = parseInt(document.getElementById('payResId').value);
+    const amount = parseFloat(document.getElementById('payAmount').value);
+    if (!amount || amount <= 0) { showToast('مبلغ غير صالح', 'error'); return; }
+    const res = DB.reservations.find(r => r.id === id);
+    if (!res) return;
+    res.paid = Math.min(res.paid + amount, res.totalCost);
+    await saveReservations();
+    closeModal('paymentModal');
+    renderPayments();
+    renderDashboard();
+    renderReservations();
+    showToast(`تم تسجيل دفعة بـ ${formatCurrency(amount)}`);
+}
+
+// ===== التقارير =====
+let currentReport = 'daily';
+
+function switchReport(type, btn) {
+    currentReport = type;
+    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderReport(type);
+}
+
+function renderReport(type) {
+    const now = new Date();
+    let startDate, endDate, title;
+
+    if (type === 'daily') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(startDate); endDate.setDate(endDate.getDate() + 1);
+        title = '📅 التقرير اليومي';
+    } else if (type === 'weekly') {
+        endDate = new Date(now); endDate.setHours(23, 59, 59);
+        startDate = new Date(now); startDate.setDate(startDate.getDate() - 6); startDate.setHours(0, 0, 0, 0);
+        title = '📆 التقرير الأسبوعي';
+    } else {
+        endDate = new Date(now); endDate.setHours(23, 59, 59);
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        title = '🗓️ التقرير الشهري';
+    }
+
+    const inRange = DB.reservations.filter(r => {
+        const d = new Date(r.createdAt || r.checkIn);
+        return d >= startDate && d <= endDate;
+    });
+
+    const checkIns = DB.reservations.filter(r => {
+        const d = new Date(r.checkIn);
+        return d >= startDate && d <= endDate;
+    });
+
+    const checkOuts = DB.reservations.filter(r => {
+        const d = new Date(r.checkOut);
+        return d >= startDate && d <= endDate;
+    });
+
+    const totalRevenue = inRange.reduce((s, r) => s + r.totalCost, 0);
+    const totalPaid = inRange.reduce((s, r) => s + r.paid, 0);
+    const totalAcc = inRange.reduce((s, r) => s + r.accommodation, 0);
+    const totalLaundry = inRange.reduce((s, r) => s + r.laundry, 0);
+    const totalBuffet = inRange.reduce((s, r) => s + r.buffet, 0);
+    const totalNights = inRange.reduce((s, r) => s + r.days, 0);
+    const avgNights = inRange.length ? (totalNights / inRange.length).toFixed(1) : 0;
+    const avgPerGuest = inRange.length ? Math.round(totalRevenue / inRange.length) : 0;
+
+    document.getElementById('reportContent').innerHTML = `
+        <div class="card">
+            <div class="card-header">
+                <h3>${title}</h3>
+                <span style="font-size:0.78rem;color:var(--text-light)">
+                    ${formatDate(startDate.toISOString().split('T')[0])} → ${formatDate(endDate.toISOString().split('T')[0])}
+                </span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card gold">
+                <div class="stat-header"><div class="stat-icon">📊</div></div>
+                <div class="stat-value">${inRange.length}</div>
+                <div class="stat-label">عدد الحجوزات</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-header"><div class="stat-icon">💰</div></div>
+                <div class="stat-value">${formatCurrency(totalRevenue)}</div>
+                <div class="stat-label">إجمالي الإيرادات</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header"><div class="stat-icon">✅</div></div>
+                <div class="stat-value">${formatCurrency(totalPaid)}</div>
+                <div class="stat-label">المبالغ الواصلة</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-header"><div class="stat-icon">⏳</div></div>
+                <div class="stat-value">${formatCurrency(totalRevenue - totalPaid)}</div>
+                <div class="stat-label">المبالغ المتبقية</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-header"><div class="stat-icon">🛏️</div></div>
+                <div class="stat-value">${formatCurrency(totalAcc)}</div>
+                <div class="stat-label">إيرادات الإقامة</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-header"><div class="stat-icon">👔</div></div>
+                <div class="stat-value">${formatCurrency(totalLaundry)}</div>
+                <div class="stat-label">إيرادات المصبغة</div>
+            </div>
+            <div class="stat-card gold" style="border-color:#14b8a6">
+                <div class="stat-header"><div class="stat-icon" style="background:rgba(20,184,166,0.15);color:#14b8a6">🍽️</div></div>
+                <div class="stat-value">${formatCurrency(totalBuffet)}</div>
+                <div class="stat-label">إيرادات البوفيه</div>
+            </div>
+            <div class="stat-card navy" style="border-color:var(--navy)">
+                <div class="stat-header"><div class="stat-icon" style="background:rgba(10,22,40,0.1);color:var(--navy)">📈</div></div>
+                <div class="stat-value">${avgNights}</div>
+                <div class="stat-label">متوسط الأيام / نزيل</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>🛬 تسجيلات الوصول (${checkIns.length})</h3></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th><th>الغرفة</th><th>النزيل</th><th>الهاتف</th>
+                            <th>الدخول</th><th>المغادرة</th><th>الأيام</th>
+                            <th>الإجمالي</th><th>الواصل</th><th>الباقي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${checkIns.length ? checkIns.map(r => `
+                            <tr>
+                                <td>#${r.id}</td>
+                                <td><strong>${r.roomNumber}</strong></td>
+                                <td>${r.guestName}</td>
+                                <td style="direction:ltr">${r.phone}</td>
+                                <td>${formatDate(r.checkIn)}</td>
+                                <td>${formatDate(r.checkOut)}</td>
+                                <td>${r.days}</td>
+                                <td><strong>${formatCurrency(r.totalCost)}</strong></td>
+                                <td style="color:var(--success)">${formatCurrency(r.paid)}</td>
+                                <td style="color:var(--danger)">${formatCurrency(r.totalCost - r.paid)}</td>
+                            </tr>
+                        `).join('') : '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-light)">لا توجد تسجيلات</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>📊 الملخص التفصيلي</h3></div>
+            <div style="padding:22px">
+                <div class="cost-summary" style="margin-top:0">
+                    <div class="cost-row"><span>إجمالي الحجوزات</span><span>${inRange.length}</span></div>
+                    <div class="cost-row"><span>عدد تسجيلات الوصول</span><span>${checkIns.length}</span></div>
+                    <div class="cost-row"><span>عدد تسجيلات المغادرة</span><span>${checkOuts.length}</span></div>
+                    <div class="cost-row"><span>إجمالي الليالي المحجوزة</span><span>${totalNights} ليلة</span></div>
+                    <div class="cost-row"><span>متوسط مدة الإقامة</span><span>${avgNights} ليلة</span></div>
+                    <div class="cost-row"><span>متوسط إنفاق النزيل</span><span>${formatCurrency(avgPerGuest)}</span></div>
+                    <div class="cost-row"><span>إيرادات الإقامة</span><span>${formatCurrency(totalAcc)}</span></div>
+                    <div class="cost-row"><span>إيرادات المصبغة</span><span>${formatCurrency(totalLaundry)}</span></div>
+                    <div class="cost-row"><span>إيرادات البوفيه</span><span>${formatCurrency(totalBuffet)}</span></div>
+                    <div class="cost-row total"><span>الإجمالي الكامل</span><span>${formatCurrency(totalRevenue)}</span></div>
+                    <div class="cost-row paid-amount"><span>✓ الواصل</span><span>${formatCurrency(totalPaid)}</span></div>
+                    <div class="cost-row remaining"><span>⏳ المتبقي</span><span>${formatCurrency(totalRevenue - totalPaid)}</span></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ===== الإعدادات =====
+function switchSettingsTab(tab, btn) {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`settings-${tab}`).classList.add('active');
+    if (tab === 'roomPrices') renderRoomPrices();
+}
+
+function loadSettingsUI() {
+    document.getElementById('settingHotelName').value = DB.settings.hotelName;
+    document.getElementById('settingHostName').value = DB.settings.hostName;
+    document.getElementById('settingCurrency').value = DB.settings.currency;
+    document.getElementById('settingTax').value = DB.settings.taxRate || 0;
+    document.getElementById('settingLaundryPrice').value = DB.settings.laundryPrice || 50;
+    document.getElementById('settingBuffetPrice').value = DB.settings.buffetPrice || 80;
+}
+
+function saveGeneralSettings() {
+    DB.settings.hotelName = document.getElementById('settingHotelName').value;
+    DB.settings.hostName = document.getElementById('settingHostName').value;
+    DB.settings.currency = document.getElementById('settingCurrency').value;
+    DB.settings.taxRate = parseFloat(document.getElementById('settingTax').value) || 0;
+    saveSettings();
+    document.getElementById('hostNameInput').value = DB.settings.hostName;
+    document.getElementById('displayHostName').textContent = DB.settings.hostName;
+    showToast('تم حفظ الإعدادات');
+}
+
+function saveServicePrices() {
+    DB.settings.laundryPrice = parseFloat(document.getElementById('settingLaundryPrice').value) || 0;
+    DB.settings.buffetPrice = parseFloat(document.getElementById('settingBuffetPrice').value) || 0;
+    saveSettings();
+    showToast('تم حفظ أسعار الخدمات');
+}
+
+function renderRoomPrices() {
+    document.getElementById('roomPricesBody').innerHTML = DB.rooms.map(r => `
+        <tr>
+            <td><strong style="font-family:Playfair Display">${r.number}</strong></td>
+            <td>${r.type}</td>
+            <td>${r.floor}</td>
+            <td>${formatCurrency(r.price)}</td>
+            <td>
+                <input type="number" class="input" style="min-width:120px;padding:6px 10px"
+                       id="price_${r.id}" value="${r.price}" min="0" step="0.5">
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="saveRoomPrice(${r.id})">💾 حفظ</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function saveRoomPrice(id) {
+    const val = parseFloat(document.getElementById(`price_${id}`).value);
+    if (isNaN(val) || val < 0) { showToast('سعر غير صالح', 'error'); return; }
+    const room = DB.rooms.find(r => r.id === id);
+    if (room) {
+        room.price = val;
+        await saveRooms();
+        renderRoomPrices();
+        showToast(`تم تحديث سعر الغرفة ${room.number}`);
+    }
+}
+
+// ===== البيانات =====
+function exportAllData() {
+    const data = { settings: DB.settings, rooms: DB.rooms, reservations: DB.reservations, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `hotel_backup_${todayISO()}.json`;
+    a.click();
+    showToast('تم تصدير النسخة الاحتياطية');
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = async ev => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (data.settings) DB.settings = data.settings;
+                if (data.rooms) DB.rooms = data.rooms;
+                if (data.reservations) DB.reservations = data.reservations;
+                DB.nextRoomId = Math.max(...DB.rooms.map(r => r.id), 0) + 1;
+                DB.nextResId = Math.max(...DB.reservations.map(r => r.id), 0) + 1;
+
+                await syncCollection('rooms', DB.rooms);
+                await syncCollection('reservations', DB.reservations);
+                await REF_SETTINGS.set({ ...DB.settings });
+                await REF_META.set({ nextRoomId: DB.nextRoomId, nextResId: DB.nextResId });
+
+                showToast('تم استيراد البيانات');
+                setTimeout(() => location.reload(), 800);
+            } catch (err) { showToast('ملف غير صالح', 'error'); }
+        };
+        reader.readAsText(e.target.files[0]);
+    };
+    input.click();
+}
+
+async function resetAllData() {
+    if (!confirm('⚠️ سيتم حذف جميع البيانات نهائياً!')) return;
+    if (!confirm('تأكيد أخير: مسح كل شيء؟')) return;
+    try {
+        await syncCollection('rooms', []);
+        await syncCollection('reservations', []);
+        await REF_SETTINGS.delete();
+        await REF_META.delete();
+    } catch (err) {
+        console.error(err);
+    }
+    localStorage.clear();
+    location.reload();
+}
+
+// ===== تصدير CSV =====
+function exportToCSV(type) {
+    if (type === 'reservations') {
+        const headers = ['#','الغرفة','النوع','النزيل','الجنسية','الهاتف','الصفة','القدوم','الدخول','المغادرة','الأيام','سلفة','الإقامة','المصبغة','البوفيه','الإجمالي','الواصل','الباقي','طريقة الدفع','حالة الدفع','الحالة'];
+        const rows = DB.reservations.map(r => [
+            r.id, r.roomNumber, r.roomType, r.guestName, r.nationality, r.phone, r.guestType,
+            r.arrivalDate, r.checkIn, r.checkOut, r.days, r.advance,
+            r.accommodation, r.laundry, r.buffet, r.totalCost, r.paid,
+            r.totalCost - r.paid, r.paymentMethod, paymentStatus(r.totalCost, r.paid), r.status
+        ]);
+        const csv = '\uFEFF' + [headers.join(','), ...rows.map(row => row.map(c => `"${c ?? ''}"`).join(','))].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `reservations_${todayISO()}.csv`;
+        a.click();
+        showToast('تم تصدير الحجوزات');
+    }
+}
+
+// ===== النوافذ =====
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+
+// ===== مستمعو الأحداث =====
+document.addEventListener('change', e => {
+    if (e.target.id === 'resRoomId') {
+        const roomId = parseInt(e.target.value);
+        if (roomId) {
+            const room = DB.rooms.find(r => r.id === roomId);
+            if (room) { document.getElementById('resRoomType').value = room.type; calculateCosts(); }
+        } else {
+            document.getElementById('resRoomType').value = '';
+            document.getElementById('resAccommodation').value = 0;
+            calculateCosts();
+        }
+    }
+    if (['resCheckIn', 'resCheckOut', 'resAdvance', 'resLaundry', 'resBuffet', 'resPaid'].includes(e.target.id)) {
+        calculateCosts();
+    }
+    if (e.target.id === 'resStatusFilter' || e.target.id === 'resPaymentFilter') renderReservations();
+});
+
+document.addEventListener('input', e => {
+    if (e.target.id === 'resSearch') renderReservations();
+});
+
+// ===== التهيئة =====
+async function initApp() {
+    try {
+        await loadFromCloud();
+    } catch (err) {
+        console.error('Firebase init error:', err);
+        showToast('تعذّر الاتصال بـ Firestore — تحقق من إعدادات المشروع', 'error');
+    }
+
+    loadSettingsUI();
+    document.getElementById('hostNameInput').value = DB.settings.hostName;
+    document.getElementById('displayHostName').textContent = DB.settings.hostName;
+    renderDashboard();
+
+    if (DB.ready) attachRealtimeListeners();
+}
+
+initApp();
+</script>
+</body>
+</html>
